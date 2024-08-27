@@ -112,9 +112,10 @@ export class ToastManager implements ToastListener {
       let snapshot = [...this.activeToasts];
       let y = this.INITIAL_Y;
 
-      for (let toast of snapshot) {
-         toast.setTop(y);
-         y += Math.ceil(toast.getHeight() + this.GAP);
+      for (let i = 0; i < snapshot.length; ++i) {
+         snapshot[i].setTop(y);
+         snapshot[i].setDelay(i * 30);
+         y += Math.ceil(snapshot[i].getHeight() + this.GAP);
       }
    }
 
@@ -215,6 +216,10 @@ export class Toast {
       }
 
       return { newToast, resolver };
+   }
+
+   setDelay(newDelay: number) {
+      this.element.style.setProperty("--_delay", `${newDelay}ms`);
    }
 
    setTop(newTop: number) {

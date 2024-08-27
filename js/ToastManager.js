@@ -48,7 +48,7 @@ export class ToastManager {
      * @param props Properties for the toast.
      */
     notify(props) {
-        const { newToast, resolver } = ToastBuilder.build(this.buildProps(props, ToastType.Neutral));
+        const { newToast, resolver } = Toast.build(this.buildProps(props, ToastType.Neutral));
         this.pushToast(newToast, resolver);
     }
     /**
@@ -56,7 +56,7 @@ export class ToastManager {
      * @param props Properties for the toast.
      */
     success(props) {
-        const { newToast, resolver } = ToastBuilder.build(this.buildProps(props, ToastType.Success));
+        const { newToast, resolver } = Toast.build(this.buildProps(props, ToastType.Success));
         this.pushToast(newToast, resolver);
     }
     /**
@@ -64,7 +64,7 @@ export class ToastManager {
      * @param props Properties for the toast.
      */
     warn(props) {
-        const { newToast, resolver } = ToastBuilder.build(this.buildProps(props, ToastType.Warn));
+        const { newToast, resolver } = Toast.build(this.buildProps(props, ToastType.Warn));
         this.pushToast(newToast, resolver);
     }
     /**
@@ -72,15 +72,16 @@ export class ToastManager {
      * @param props Properties for the toast.
      */
     error(props) {
-        const { newToast, resolver } = ToastBuilder.build(this.buildProps(props, ToastType.Error));
+        const { newToast, resolver } = Toast.build(this.buildProps(props, ToastType.Error));
         this.pushToast(newToast, resolver);
     }
     updatePositions() {
         let snapshot = [...this.activeToasts];
         let y = this.INITIAL_Y;
-        for (let toast of snapshot) {
-            toast.setTop(y);
-            y += Math.ceil(toast.getHeight() + this.GAP);
+        for (let i = 0; i < snapshot.length; ++i) {
+            snapshot[i].setTop(y);
+            snapshot[i].setDelay(i * 30);
+            y += Math.ceil(snapshot[i].getHeight() + this.GAP);
         }
     }
     onToastRemoved(toast) {
@@ -151,17 +152,6 @@ export class Toast {
             resolve(true);
         });
     }
-    setTop(newTop) {
-        this.element.style.setProperty("--_top", `${newTop}px`);
-    }
-    getHeight() {
-        return this.height;
-    }
-}
-/**
- * Internal class used to build a Toast and handle its removal
- */
-class ToastBuilder {
     static build(props) {
         let newToast = new Toast(props);
         let resolver = null;
@@ -175,6 +165,15 @@ class ToastBuilder {
             });
         }
         return { newToast, resolver };
+    }
+    setDelay(newDelay) {
+        this.element.style.setProperty("--_delay", `${newDelay}ms`);
+    }
+    setTop(newTop) {
+        this.element.style.setProperty("--_top", `${newTop}px`);
+    }
+    getHeight() {
+        return this.height;
     }
 }
 // #endregion Classes

@@ -45,6 +45,7 @@
     --_bg: var(--tm-neutral-background-color);
     --_border-hover: var(--tm-neutral-border-hover-color);
     --_border: var(--tm-neutral-border-color);
+    --_delay: 0ms;
     --_duration: 2000ms;
     --_text: var(--tm-neutral-text-color);
     --_timer: var(--tm-neutral-timer-color);
@@ -70,7 +71,7 @@
     padding: var(--tm-padding-block) var(--tm-padding-block) var(--tm-padding-block) var(--tm-padding-inline);
     position: fixed;
     top: var(--_top);
-    transition: opacity 200ms ease, top 300ms cubic-bezier(0.19, 1, 0.22, 1), transform 300ms cubic-bezier(0.19, 1, 0.22, 1);
+    transition: opacity 200ms ease, top 300ms cubic-bezier(0.19, 1, 0.22, 1) var(--_delay), transform 300ms cubic-bezier(0.19, 1, 0.22, 1);
 
     &.warn {
         --_bg: var(--tm-warn-background-color);
