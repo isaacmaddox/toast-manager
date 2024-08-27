@@ -10,6 +10,7 @@ export type ToastProps = {
    message: string;
    duration: number;
    onclick?: (this: GlobalEventHandlers, ev: MouseEvent) => any;
+   listener: ToastListener
 }
 
 /**
@@ -29,15 +30,15 @@ enum ToastType {
    Error
 }
 
-type ToastPropsWithRemoveFunction = ToastProps & {
-   onRemove: CallableFunction;
+interface ToastListener {
+   onToastRemoved(toast: Toast): void;
 }
 
 // #endregion Types
 
 // #region Classes
 
-export class ToastManager {
+export class ToastManager implements ToastListener {
    private readonly DEFAULT_DURATION = 3000;
    private readonly INITIAL_Y = 16;
    private readonly GAP = 8;
@@ -55,40 +56,59 @@ export class ToastManager {
       }
    }
 
-   getProps(props): ToastPropsWithRemoveFunction {
+   buildProps(props: ToastBuildProps, type): ToastProps {
       return {
          ...props,
          duration: props.duration !== undefined ? props.duration : this.DEFAULT_DURATION,
-         type: ToastType.Neutral,
+         type: type,
          template: this.template,
-         onRemove: this.onRemoveFunction
-      };
+         listener: this
+      }
    }
 
-   onRemoveFunction = (toast) => {
-      this.activeToasts.splice(this.activeToasts.indexOf(toast), 1);
-      this.updatePositions();
-   }
-
-   notify(props: ToastBuildProps) {
-      let newProps = { ...this.getProps(props), onRemove: this.onRemoveFunction }
-
-      const { newToast, resolver }: { newToast: Toast, resolver?: Promise<boolean> } = ToastBuilder.build(newProps);
-
+   pushToast(newToast: Toast, resolver: Promise<Toast>): void {
       this.activeToasts.push(newToast);
       this.updatePositions();
 
-      resolver?.then(this.onRemoveFunction);
+      resolver?.then((toast) => {
+         this.onToastRemoved(toast)
+      });
+   }
+
+   notify(props: ToastBuildProps) {
+      const { newToast, resolver } = ToastBuilder.build(this.buildProps(props, ToastType.Neutral));
+      this.pushToast(newToast, resolver);
+   }
+
+   success(props: ToastBuildProps) {
+      const { newToast, resolver } = ToastBuilder.build(this.buildProps(props, ToastType.Success));
+      this.pushToast(newToast, resolver);
+   }
+
+   warn(props: ToastBuildProps) {
+      const { newToast, resolver } = ToastBuilder.build(this.buildProps(props, ToastType.Warn));
+      this.pushToast(newToast, resolver);
+   }
+
+   error(props: ToastBuildProps) {
+      const { newToast, resolver } = ToastBuilder.build(this.buildProps(props, ToastType.Error));
+      this.pushToast(newToast, resolver);
    }
 
    updatePositions() {
       let snapshot = [...this.activeToasts];
       let y = this.INITIAL_Y;
 
-      for (let toast of snapshot) {
-         toast.setTop(y);
-         y += toast.getHeight() + this.GAP;
+      for (let i = 0; i < snapshot.length; ++i) {
+         snapshot[i].setTop(y);
+         snapshot[i].setDelay(i * 30);
+         y += snapshot[i].getHeight() + this.GAP;
       }
+   }
+
+   onToastRemoved(toast: Toast): void {
+      this.activeToasts.splice(this.activeToasts.indexOf(toast), 1);
+      this.updatePositions();
    }
 }
 
@@ -97,7 +117,7 @@ export class Toast {
    private element: HTMLDivElement;
    private height: number;
 
-   constructor(props: ToastPropsWithRemoveFunction) {
+   constructor(props: ToastProps) {
       let template = props.template.content.cloneNode(true) as HTMLTemplateElement;
       let toast = template.querySelector(".toast") as HTMLDivElement;
 
@@ -140,13 +160,14 @@ export class Toast {
 
       dismissButton.onclick = () => {
          this.remove().then(() => {
-            props.onRemove();
+            props.listener.onToastRemoved(this);
          });
       };
 
       document.body.prepend(template);
       this.height = toast.getBoundingClientRect().height;
       this.element = toast as HTMLDivElement;
+      this.setDuration(props.duration);
    }
 
    remove() {
@@ -165,21 +186,33 @@ export class Toast {
       this.element.style.setProperty("--_top", `${newTop}px`);
    }
 
+   setDelay(newDelay: number) {
+      this.element.style.setProperty("--_delay", `${newDelay}ms`);
+   }
+
+   setDuration(newDuration: number) {
+      if (newDuration > 0) {
+         this.element.style.setProperty("--_duration", `${newDuration}ms`);
+      } else {
+         this.element.classList.add("static");
+      }
+   }
+
    getHeight() {
       return this.height;
    }
 }
 
 export class ToastBuilder {
-   static build(props: ToastPropsWithRemoveFunction) {
+   static build(props: ToastProps): { newToast: Toast, resolver?: Promise<Toast> } {
       let newToast = new Toast(props);
       let resolver = null;
 
       if (props.duration > 0) {
-         resolver = new Promise<boolean>(resolve => {
+         resolver = new Promise<Toast>(resolve => {
             setTimeout(() => {
                newToast.remove().then(() => {
-                  resolve(true);
+                  resolve(newToast);
                })
             }, props.duration);
          });

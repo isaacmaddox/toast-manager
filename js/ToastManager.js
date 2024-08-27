@@ -24,33 +24,50 @@ export class ToastManager {
             this.template = template;
         }
     }
-    getProps(props) {
+    buildProps(props, type) {
         return {
             ...props,
             duration: props.duration !== undefined ? props.duration : this.DEFAULT_DURATION,
-            type: ToastType.Neutral,
+            type: type,
             template: this.template,
-            onRemove: this.onRemoveFunction
+            listener: this
         };
     }
-    onRemoveFunction = (toast) => {
-        this.activeToasts.splice(this.activeToasts.indexOf(toast), 1);
-        this.updatePositions();
-    };
-    notify(props) {
-        let newProps = { ...this.getProps(props), onRemove: this.onRemoveFunction };
-        const { newToast, resolver } = ToastBuilder.build(newProps);
+    pushToast(newToast, resolver) {
         this.activeToasts.push(newToast);
         this.updatePositions();
-        resolver?.then(this.onRemoveFunction);
+        resolver?.then((toast) => {
+            this.onToastRemoved(toast);
+        });
+    }
+    notify(props) {
+        const { newToast, resolver } = ToastBuilder.build(this.buildProps(props, ToastType.Neutral));
+        this.pushToast(newToast, resolver);
+    }
+    success(props) {
+        const { newToast, resolver } = ToastBuilder.build(this.buildProps(props, ToastType.Success));
+        this.pushToast(newToast, resolver);
+    }
+    warn(props) {
+        const { newToast, resolver } = ToastBuilder.build(this.buildProps(props, ToastType.Warn));
+        this.pushToast(newToast, resolver);
+    }
+    error(props) {
+        const { newToast, resolver } = ToastBuilder.build(this.buildProps(props, ToastType.Error));
+        this.pushToast(newToast, resolver);
     }
     updatePositions() {
         let snapshot = [...this.activeToasts];
         let y = this.INITIAL_Y;
-        for (let toast of snapshot) {
-            toast.setTop(y);
-            y += toast.getHeight() + this.GAP;
+        for (let i = 0; i < snapshot.length; ++i) {
+            snapshot[i].setTop(y);
+            snapshot[i].setDelay(i * 30);
+            y += snapshot[i].getHeight() + this.GAP;
         }
+    }
+    onToastRemoved(toast) {
+        this.activeToasts.splice(this.activeToasts.indexOf(toast), 1);
+        this.updatePositions();
     }
 }
 export class Toast {
@@ -93,12 +110,13 @@ export class Toast {
         }
         dismissButton.onclick = () => {
             this.remove().then(() => {
-                props.onRemove();
+                props.listener.onToastRemoved(this);
             });
         };
         document.body.prepend(template);
         this.height = toast.getBoundingClientRect().height;
         this.element = toast;
+        this.setDuration(props.duration);
     }
     remove() {
         return new Promise(resolve => {
@@ -112,6 +130,17 @@ export class Toast {
     setTop(newTop) {
         this.element.style.setProperty("--_top", `${newTop}px`);
     }
+    setDelay(newDelay) {
+        this.element.style.setProperty("--_delay", `${newDelay}ms`);
+    }
+    setDuration(newDuration) {
+        if (newDuration > 0) {
+            this.element.style.setProperty("--_duration", `${newDuration}ms`);
+        }
+        else {
+            this.element.classList.add("static");
+        }
+    }
     getHeight() {
         return this.height;
     }
@@ -124,7 +153,7 @@ export class ToastBuilder {
             resolver = new Promise(resolve => {
                 setTimeout(() => {
                     newToast.remove().then(() => {
-                        resolve(true);
+                        resolve(newToast);
                     });
                 }, props.duration);
             });
