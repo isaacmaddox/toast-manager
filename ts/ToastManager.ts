@@ -77,7 +77,7 @@ export class ToastManager implements ToastListener {
     * @param props Properties for the toast.
     */
    notify(props: ToastBuildProps) {
-      const { newToast, resolver } = ToastBuilder.build(this.buildProps(props, ToastType.Neutral));
+      const { newToast, resolver } = Toast.build(this.buildProps(props, ToastType.Neutral));
       this.pushToast(newToast, resolver);
    }
 
@@ -86,7 +86,7 @@ export class ToastManager implements ToastListener {
     * @param props Properties for the toast.
     */
    success(props: ToastBuildProps) {
-      const { newToast, resolver } = ToastBuilder.build(this.buildProps(props, ToastType.Success));
+      const { newToast, resolver } = Toast.build(this.buildProps(props, ToastType.Success));
       this.pushToast(newToast, resolver);
    }
 
@@ -95,7 +95,7 @@ export class ToastManager implements ToastListener {
     * @param props Properties for the toast.
     */
    warn(props: ToastBuildProps) {
-      const { newToast, resolver } = ToastBuilder.build(this.buildProps(props, ToastType.Warn));
+      const { newToast, resolver } = Toast.build(this.buildProps(props, ToastType.Warn));
       this.pushToast(newToast, resolver);
    }
 
@@ -104,7 +104,7 @@ export class ToastManager implements ToastListener {
     * @param props Properties for the toast.
     */
    error(props: ToastBuildProps) {
-      const { newToast, resolver } = ToastBuilder.build(this.buildProps(props, ToastType.Error));
+      const { newToast, resolver } = Toast.build(this.buildProps(props, ToastType.Error));
       this.pushToast(newToast, resolver);
    }
 
@@ -200,19 +200,6 @@ export class Toast {
       });
    }
 
-   setTop(newTop: number) {
-      this.element.style.setProperty("--_top", `${newTop}px`);
-   }
-
-   getHeight() {
-      return this.height;
-   }
-}
-
-/**
- * Internal class used to build a Toast and handle its removal
- */
-class ToastBuilder {
    static build(props: ToastProps): { newToast: Toast, resolver?: Promise<Toast> } {
       let newToast = new Toast(props);
       let resolver = null;
@@ -228,6 +215,14 @@ class ToastBuilder {
       }
 
       return { newToast, resolver };
+   }
+
+   setTop(newTop: number) {
+      this.element.style.setProperty("--_top", `${newTop}px`);
+   }
+
+   getHeight() {
+      return this.height;
    }
 }
 
