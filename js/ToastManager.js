@@ -8,6 +8,9 @@ var ToastType;
 })(ToastType || (ToastType = {}));
 // #endregion Types
 // #region Classes
+/**
+ * Class to manage Toasts
+ */
 export class ToastManager {
     DEFAULT_DURATION = 3000;
     INITIAL_Y = 16;
@@ -40,18 +43,34 @@ export class ToastManager {
             this.onToastRemoved(toast);
         });
     }
+    /**
+     * Build and push a neutral toast to the user.
+     * @param props Properties for the toast.
+     */
     notify(props) {
         const { newToast, resolver } = ToastBuilder.build(this.buildProps(props, ToastType.Neutral));
         this.pushToast(newToast, resolver);
     }
+    /**
+     * Build and push a success toast to the user.
+     * @param props Properties for the toast.
+     */
     success(props) {
         const { newToast, resolver } = ToastBuilder.build(this.buildProps(props, ToastType.Success));
         this.pushToast(newToast, resolver);
     }
+    /**
+     * Build and push a warning toast to the user.
+     * @param props Properties for the toast.
+     */
     warn(props) {
         const { newToast, resolver } = ToastBuilder.build(this.buildProps(props, ToastType.Warn));
         this.pushToast(newToast, resolver);
     }
+    /**
+     * Build and push an error toast to the user.
+     * @param props Properties for the toast.
+     */
     error(props) {
         const { newToast, resolver } = ToastBuilder.build(this.buildProps(props, ToastType.Error));
         this.pushToast(newToast, resolver);
@@ -59,10 +78,9 @@ export class ToastManager {
     updatePositions() {
         let snapshot = [...this.activeToasts];
         let y = this.INITIAL_Y;
-        for (let i = 0; i < snapshot.length; ++i) {
-            snapshot[i].setTop(y);
-            snapshot[i].setDelay(i * 30);
-            y += snapshot[i].getHeight() + this.GAP;
+        for (let toast of snapshot) {
+            toast.setTop(y);
+            y += Math.ceil(toast.getHeight() + this.GAP);
         }
     }
     onToastRemoved(toast) {
@@ -74,6 +92,7 @@ export class Toast {
     TRANSITION_DURATION = 500;
     element;
     height;
+    removed = false;
     constructor(props) {
         let template = props.template.content.cloneNode(true);
         let toast = template.querySelector(".toast");
@@ -116,9 +135,11 @@ export class Toast {
         document.body.prepend(template);
         this.height = toast.getBoundingClientRect().height;
         this.element = toast;
-        this.setDuration(props.duration);
     }
     remove() {
+        if (this.removed)
+            return;
+        this.removed = true;
         return new Promise(resolve => {
             this.element?.classList.add("remove");
             setTimeout(() => {
@@ -129,17 +150,6 @@ export class Toast {
     }
     setTop(newTop) {
         this.element.style.setProperty("--_top", `${newTop}px`);
-    }
-    setDelay(newDelay) {
-        this.element.style.setProperty("--_delay", `${newDelay}ms`);
-    }
-    setDuration(newDuration) {
-        if (newDuration > 0) {
-            this.element.style.setProperty("--_duration", `${newDuration}ms`);
-        }
-        else {
-            this.element.classList.add("static");
-        }
     }
     getHeight() {
         return this.height;
@@ -152,7 +162,7 @@ export class ToastBuilder {
         if (props.duration > 0) {
             resolver = new Promise(resolve => {
                 setTimeout(() => {
-                    newToast.remove().then(() => {
+                    newToast.remove()?.then(() => {
                         resolve(newToast);
                     });
                 }, props.duration);

@@ -1,8 +1,5 @@
 // #region Types
 
-/**
- * @description Properties used to call the Toast constructor. This contains all the ingredients to make your Toast come to life!
- */
 export type ToastProps = {
    type: ToastType;
    template: HTMLTemplateElement;
@@ -13,9 +10,6 @@ export type ToastProps = {
    listener: ToastListener
 }
 
-/**
- * @description Properties used to call a Toast building function. This type excludes the `type` property and marks `duration` as optional.
- */
 export type ToastBuildProps = {
    title?: string;
    message: string;
@@ -38,6 +32,9 @@ interface ToastListener {
 
 // #region Classes
 
+/**
+ * Class to manage Toasts
+ */
 export class ToastManager implements ToastListener {
    private readonly DEFAULT_DURATION = 3000;
    private readonly INITIAL_Y = 16;
@@ -56,7 +53,7 @@ export class ToastManager implements ToastListener {
       }
    }
 
-   buildProps(props: ToastBuildProps, type): ToastProps {
+   private buildProps(props: ToastBuildProps, type: ToastType): ToastProps {
       return {
          ...props,
          duration: props.duration !== undefined ? props.duration : this.DEFAULT_DURATION,
@@ -66,7 +63,7 @@ export class ToastManager implements ToastListener {
       }
    }
 
-   pushToast(newToast: Toast, resolver: Promise<Toast>): void {
+   private pushToast(newToast: Toast, resolver: Promise<Toast>) {
       this.activeToasts.push(newToast);
       this.updatePositions();
 
@@ -75,38 +72,53 @@ export class ToastManager implements ToastListener {
       });
    }
 
+   /**
+    * Build and push a neutral toast to the user.
+    * @param props Properties for the toast.
+    */
    notify(props: ToastBuildProps) {
       const { newToast, resolver } = ToastBuilder.build(this.buildProps(props, ToastType.Neutral));
       this.pushToast(newToast, resolver);
    }
 
+   /**
+    * Build and push a success toast to the user.
+    * @param props Properties for the toast.
+    */
    success(props: ToastBuildProps) {
       const { newToast, resolver } = ToastBuilder.build(this.buildProps(props, ToastType.Success));
       this.pushToast(newToast, resolver);
    }
 
+   /**
+    * Build and push a warning toast to the user.
+    * @param props Properties for the toast.
+    */
    warn(props: ToastBuildProps) {
       const { newToast, resolver } = ToastBuilder.build(this.buildProps(props, ToastType.Warn));
       this.pushToast(newToast, resolver);
    }
 
+   /**
+    * Build and push an error toast to the user.
+    * @param props Properties for the toast.
+    */
    error(props: ToastBuildProps) {
       const { newToast, resolver } = ToastBuilder.build(this.buildProps(props, ToastType.Error));
       this.pushToast(newToast, resolver);
    }
 
-   updatePositions() {
+   private updatePositions() {
       let snapshot = [...this.activeToasts];
       let y = this.INITIAL_Y;
 
-      for (let i = 0; i < snapshot.length; ++i) {
-         snapshot[i].setTop(y);
-         snapshot[i].setDelay(i * 30);
-         y += snapshot[i].getHeight() + this.GAP;
+      for (let toast of snapshot) {
+         toast.setTop(y);
+         y += Math.ceil(toast.getHeight() + this.GAP);
       }
    }
 
-   onToastRemoved(toast: Toast): void {
+   onToastRemoved(toast: Toast) {
       this.activeToasts.splice(this.activeToasts.indexOf(toast), 1);
       this.updatePositions();
    }
@@ -116,6 +128,7 @@ export class Toast {
    private readonly TRANSITION_DURATION = 500;
    private element: HTMLDivElement;
    private height: number;
+   private removed: boolean = false;
 
    constructor(props: ToastProps) {
       let template = props.template.content.cloneNode(true) as HTMLTemplateElement;
@@ -167,10 +180,12 @@ export class Toast {
       document.body.prepend(template);
       this.height = toast.getBoundingClientRect().height;
       this.element = toast as HTMLDivElement;
-      this.setDuration(props.duration);
    }
 
    remove() {
+      if (this.removed) return;
+      this.removed = true;
+
       return new Promise<boolean>(resolve => {
          this.element?.classList.add("remove");
 
@@ -186,18 +201,6 @@ export class Toast {
       this.element.style.setProperty("--_top", `${newTop}px`);
    }
 
-   setDelay(newDelay: number) {
-      this.element.style.setProperty("--_delay", `${newDelay}ms`);
-   }
-
-   setDuration(newDuration: number) {
-      if (newDuration > 0) {
-         this.element.style.setProperty("--_duration", `${newDuration}ms`);
-      } else {
-         this.element.classList.add("static");
-      }
-   }
-
    getHeight() {
       return this.height;
    }
@@ -211,7 +214,7 @@ export class ToastBuilder {
       if (props.duration > 0) {
          resolver = new Promise<Toast>(resolve => {
             setTimeout(() => {
-               newToast.remove().then(() => {
+               newToast.remove()?.then(() => {
                   resolve(newToast);
                })
             }, props.duration);

@@ -1,6 +1,6 @@
 :root {
     --tm-border-radius: .5rem;
-    --tm-box-shadow: 0px 2px 15px light-dark(hsla(0, 0%, 95%), transparent);
+    --tm-box-shadow: 0px 2px 15px light-dark(hsla(0, 0%, 0%, .1), transparent);
     --tm-dismiss-icon-color: hsl(0, 0%, 65%);
     --tm-dismiss-icon-hover-color: hsl(0, 0%, 35%);
     --tm-font-family: "Geist Variable", system-ui;
@@ -8,7 +8,7 @@
     --tm-gap: .5rem;
     --tm-padding-block: 1rem;
     --tm-padding-inline: 1.2rem;
-    --tm-title-font-size: 1.125rem;
+    --tm-title-font-size: 1.175rem;
     --tm-z-remove: 1;
     --tm-z: 2;
 
@@ -45,7 +45,6 @@
     --_bg: var(--tm-neutral-background-color);
     --_border-hover: var(--tm-neutral-border-hover-color);
     --_border: var(--tm-neutral-border-color);
-    --_delay: 0ms;
     --_duration: 2000ms;
     --_text: var(--tm-neutral-text-color);
     --_timer: var(--tm-neutral-timer-color);
@@ -71,17 +70,7 @@
     padding: var(--tm-padding-block) var(--tm-padding-block) var(--tm-padding-block) var(--tm-padding-inline);
     position: fixed;
     top: var(--_top);
-    transition: opacity 200ms ease, top 500ms cubic-bezier(0.19, 1, 0.22, 1) var(--_delay), transform 500ms cubic-bezier(0.19, 1, 0.22, 1);
-
-    &:not(.static)::after {
-        animation: time var(--_duration) linear forwards;
-        background: var(--_timer);
-        bottom: 0;
-        content: '';
-        height: 2px;
-        inset-inline: 0;
-        position: absolute;
-    }
+    transition: opacity 200ms ease, top 300ms cubic-bezier(0.19, 1, 0.22, 1), transform 300ms cubic-bezier(0.19, 1, 0.22, 1);
 
     &.warn {
         --_bg: var(--tm-warn-background-color);
