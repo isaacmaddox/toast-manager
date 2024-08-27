@@ -124,6 +124,9 @@ export class ToastManager implements ToastListener {
    }
 }
 
+/**
+ * The internal class representing a Toast
+ */
 export class Toast {
    private readonly TRANSITION_DURATION = 500;
    private element: HTMLDivElement;
@@ -206,7 +209,10 @@ export class Toast {
    }
 }
 
-export class ToastBuilder {
+/**
+ * Internal class used to build a Toast and handle its removal
+ */
+class ToastBuilder {
    static build(props: ToastProps): { newToast: Toast, resolver?: Promise<Toast> } {
       let newToast = new Toast(props);
       let resolver = null;

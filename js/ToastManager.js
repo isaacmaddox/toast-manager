@@ -88,6 +88,9 @@ export class ToastManager {
         this.updatePositions();
     }
 }
+/**
+ * The internal class representing a Toast
+ */
 export class Toast {
     TRANSITION_DURATION = 500;
     element;
@@ -155,7 +158,10 @@ export class Toast {
         return this.height;
     }
 }
-export class ToastBuilder {
+/**
+ * Internal class used to build a Toast and handle its removal
+ */
+class ToastBuilder {
     static build(props) {
         let newToast = new Toast(props);
         let resolver = null;

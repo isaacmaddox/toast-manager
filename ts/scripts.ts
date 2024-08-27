@@ -1,4 +1,4 @@
-import { Toast, ToastManager } from "./ToastManager.js";
+import { ToastManager } from "./ToastManager.js";
 
 let manager = new ToastManager();
 
