@@ -1,17 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ToastManager</title>
-  </head>
-  <body>
-    <template id="neutral-toast">
-      <div class="toast" aria-live="polite">
-        <h4 class="toast-title">Title</h4>
-        <p class="toast-message">This is the toast message</p>
-      </div>
-    </template>
-    <script src="./js/scripts.js" type="module"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css">
+  <title>ToastManager</title>
+</head>
+
+<body>
+  <template id="toast">
+    <div class="toast" aria-live="polite">
+      <h4 class="toast-title">Title</h4>
+      <p class="toast-message">This is the toast message</p>
+      <button class="dismiss" type="button" aria-label="Dismiss">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" clip-rule="evenodd"
+            d="M6.16634 16.773C5.87345 17.0659 5.87345 17.5408 6.16634 17.8336C6.45923 18.1265 6.93411 18.1265 7.227 17.8336L12 13.0607L16.7729 17.8337C17.0658 18.1265 17.5407 18.1265 17.8336 17.8337C18.1265 17.5408 18.1265 17.0659 17.8336 16.773L13.0606 12L17.8336 7.22705C18.1265 6.93415 18.1265 6.45928 17.8336 6.16639C17.5407 5.87349 17.0658 5.87349 16.7729 6.16639L12 10.9394L7.22699 6.16639C6.93409 5.8735 6.45922 5.8735 6.16633 6.16639C5.87343 6.45928 5.87343 6.93416 6.16633 7.22705L10.9393 12L6.16634 16.773Z"
+            fill="#3E4138" />
+        </svg>
+      </button>
+    </div>
+  </template>
+  <script src="./js/scripts.js" type="module"></script>
+</body>
+
 </html>
