@@ -195,7 +195,7 @@ export class Toast {
     this.element = toast as HTMLDivElement;
   }
 
-  remove() {
+  remove(): Promise<boolean> {
     if (this.removed) return;
     this.removed = true;
 
@@ -244,7 +244,7 @@ export class Toast {
     this.element.style.setProperty("--_top", `${newTop}px`);
   }
 
-  getHeight() {
+  getHeight(): number {
     return this.height;
   }
 }
