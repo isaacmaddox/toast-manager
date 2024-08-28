@@ -67,6 +67,7 @@
     position: fixed;
     top: var(--_top);
     transition: opacity 200ms ease, top 300ms cubic-bezier(0.19, 1, 0.22, 1) var(--_delay), transform 300ms cubic-bezier(0.19, 1, 0.22, 1), border 200ms ease;
+    z-index: var(--tm-z);
 
     &.warn {
         --_bg: var(--tm-warn-background-color);
@@ -119,6 +120,34 @@
         z-index: var(--tm-z-remove);
     }
 
+    @media (pointer: coarse) {
+        bottom: 16px;
+        top: unset;
+        width: calc(100% - 32px);
+        animation: showToastMobile 500ms cubic-bezier(0.19, 1, 0.22, 1);
+
+        &:nth-of-type(2) {
+            z-index: var(--tm-z-remove);
+            opacity: .5;
+            transform: translateY(-10%) scale(.9);
+        }
+
+        &:nth-of-type(3) {
+            z-index: var(--tm-z-remove);
+            opacity: .2;
+            transform: translateY(-15%) scale(.85);
+        }
+
+        &:nth-of-type(n + 3) {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        &.remove {
+            transform: translateY(150%);
+        }
+    }
+
     .toast-title,
     .toast-message {
         grid-column: content;
@@ -139,7 +168,7 @@
         align-self: start;
         background: transparent;
         border: 0;
-        color: var(--tm-dismiss-icon-color);
+        color: var(--tm-dismiss-icon-hover-color);
         cursor: pointer;
         display: grid;
         grid-column: button;
@@ -147,6 +176,8 @@
         transition: color 200ms ease;
 
         @media (pointer: fine) {
+            color: var(--tm-dismiss-icon-color);
+
             &:hover {
                 color: var(--tm-dismiss-icon-hover-color);
             }
@@ -167,6 +198,16 @@
 
     to {
         transform: translateX(0);
+    }
+}
+
+@keyframes showToastMobile {
+    from {
+        transform: translateY(150%);
+    }
+
+    to {
+        transform: translateY(0)
     }
 }
 
