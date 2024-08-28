@@ -23,6 +23,16 @@ header {
    min-height: 100svh;
    place-content: center;
    text-align: center;
+   background-image: radial-gradient(#fff 10svh, transparent 20svh), url(./hero_background.jpg);
+   background-size: cover;
+   background-position: center;
+   background-repeat: no-repeat;
+
+   @media (orientation: portrait) {
+      background-image: radial-gradient(#fff 10svh, transparent 20svh), url(./hero_background_small.jpg);
+      background-size: cover;
+      background-repeat: no-repeat;
+   }
 
    h1 {
       font-size: 2.5rem;

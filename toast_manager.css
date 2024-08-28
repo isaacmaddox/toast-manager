@@ -1,8 +1,6 @@
 :root {
     --tm-border-radius: .5rem;
     --tm-box-shadow: 0px 2px 15px light-dark(hsla(0, 0%, 0%, .1), transparent);
-    --tm-dismiss-icon-color: hsl(0, 0%, 65%);
-    --tm-dismiss-icon-hover-color: hsl(0, 0%, 35%);
     --tm-font-family: "Geist Variable", system-ui;
     --tm-font-size: .9rem;
     --tm-gap: .5rem;
@@ -17,24 +15,32 @@
     --tm-neutral-border-hover-color: light-dark(hsla(0, 0%, 0%, .2), hsla(0, 0%, 100%, .2));
     --tm-neutral-text-color: light-dark(hsl(0, 0%, 20%), hsl(0, 0%, 90%));
     --tm-neutral-title-color: light-dark(hsl(0, 0%, 0%), hsl(0, 0%, 100%));
+    --tm-neutral-dismiss-icon-color: hsl(0, 0%, 65%);
+    --tm-neutral-dismiss-icon-hover-color: hsl(0, 0%, 35%);
 
     --tm-warn-background-color: hsl(35, 100%, 90%);
     --tm-warn-border-color: hsla(35, 50%, 35%, .1);
     --tm-warn-border-hover-color: hsla(35, 50%, 15%, .2);
     --tm-warn-text-color: hsl(35, 50%, 20%);
     --tm-warn-title-color: hsl(35, 65%, 15%);
+    --tm-warn-dismiss-icon-color: hsl(35, 50%, 65%);
+    --tm-warn-dismiss-icon-hover-color: hsl(35, 50%, 35%);
 
     --tm-error-background-color: hsl(10, 100%, 90%);
     --tm-error-border-color: hsla(10, 50%, 10%, .1);
     --tm-error-border-hover-color: hsla(10, 50%, 15%, .2);
     --tm-error-text-color: hsl(10, 50%, 20%);
     --tm-error-title-color: hsl(10, 65%, 15%);
+    --tm-error-dismiss-icon-color: hsl(10, 50%, 65%);
+    --tm-error-dismiss-icon-hover-color: hsl(10, 50%, 35%);
 
     --tm-success-background-color: hsl(150, 100%, 90%);
     --tm-success-border-color: hsla(150, 50%, 10%, .1);
     --tm-success-border-hover-color: hsla(150, 50%, 15%, .2);
     --tm-success-text-color: hsl(150, 50%, 20%);
     --tm-success-title-color: hsl(150, 65%, 15%);
+    --tm-success-dismiss-icon-color: hsl(150, 50%, 65%);
+    --tm-success-dismiss-icon-hover-color: hsl(150, 50%, 35%);
 }
 
 .toast {
@@ -45,6 +51,8 @@
     --_duration: 2000ms;
     --_text: var(--tm-neutral-text-color);
     --_title: var(--tm-neutral-title-color);
+    --_dismiss: var(--tm-neutral-dismiss-icon-color);
+    --_dismiss-hover: var(--tm-neutral-dismiss-icon-hover-color);
     --_z: var(--tm-z);
 
     align-items: center;
@@ -75,6 +83,8 @@
         --_border: var(--tm-warn-border-color);
         --_text: var(--tm-warn-text-color);
         --_title: var(--tm-warn-title-color);
+        --_dismiss: var(--tm-warn-dismiss-icon-color);
+        --_dismiss-hover: var(--tm-warn-dismiss-icon-hover-color);
     }
 
     &.error {
@@ -83,6 +93,8 @@
         --_border: var(--tm-error-border-color);
         --_text: var(--tm-error-text-color);
         --_title: var(--tm-error-title-color);
+        --_dismiss: var(--tm-error-dismiss-icon-color);
+        --_dismiss-hover: var(--tm-error-dismiss-icon-hover-color);
     }
 
     &.success {
@@ -91,6 +103,8 @@
         --_border: var(--tm-success-border-color);
         --_text: var(--tm-success-text-color);
         --_title: var(--tm-success-title-color);
+        --_dismiss: var(--tm-success-dismiss-icon-color);
+        --_dismiss-hover: var(--tm-success-dismiss-icon-hover-color);
     }
 
     &:has(.toast-title) {
@@ -123,7 +137,6 @@
     @media (pointer: coarse) or (width < 400px) {
         bottom: 16px;
         top: unset;
-        /* width: calc(100% - 32px); */
         max-width: unset;
         inset-inline: 16px;
         animation: showToastMobile 500ms cubic-bezier(0.19, 1, 0.22, 1);
@@ -170,7 +183,7 @@
         align-self: start;
         background: transparent;
         border: 0;
-        color: var(--tm-dismiss-icon-hover-color);
+        color: var(--_dismiss-hover);
         cursor: pointer;
         display: grid;
         grid-column: button;
@@ -178,10 +191,10 @@
         transition: color 200ms ease;
 
         @media (pointer: fine) {
-            color: var(--tm-dismiss-icon-color);
+            color: var(--_dismiss);
 
             &:hover {
-                color: var(--tm-dismiss-icon-hover-color);
+                color: var(--_dismiss-hover);
             }
         }
 
