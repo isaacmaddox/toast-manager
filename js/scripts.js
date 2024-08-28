@@ -5,13 +5,15 @@ let messages = [
     "Glad you could make it!",
     "Thanks for showing up!",
     "Boo!",
-    "¡Bienvenidos!"
+    "¡Bienvenidos!",
 ];
 let active = toastManager.getCount();
 let input = document.querySelector("input");
 document.getElementById("toast-trigger").addEventListener("click", () => {
     active = toastManager.getCount();
-    let msg = input.value.trim() !== "" ? input.value.trim() : messages[Math.floor(Math.random() * messages.length)];
+    let msg = input.value.trim() !== ""
+        ? input.value.trim()
+        : messages[Math.floor(Math.random() * messages.length)];
     input.value = "";
     if (active <= 3) {
         toastManager.notify({
@@ -28,7 +30,7 @@ document.getElementById("toast-trigger").addEventListener("click", () => {
     else if (active < 6) {
         toastManager.error({
             message: "We'll have to stop you there",
-            duration: 0
+            duration: 0,
         });
     }
 });

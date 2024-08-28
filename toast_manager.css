@@ -67,6 +67,7 @@
     display: grid;
     font-family: var(--tm-font-family);
     font-size: var(--tm-font-size);
+    font-weight: 500;
     grid-template-columns: [content-start] 1fr [content-end button-start] max-content [button-end];
     left: 16px;
     max-width: min(100% - 32px, 40ch);

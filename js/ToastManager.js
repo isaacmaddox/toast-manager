@@ -22,7 +22,7 @@ export class ToastManager {
             type: type,
             template: this.template,
             listener: this,
-            dismissable: props.dismissable ?? true
+            dismissable: props.dismissable ?? true,
         };
     }
     pushToast(newToast, resolver) {
@@ -92,6 +92,15 @@ export class Toast {
     element;
     height;
     removed = false;
+    static cssProps = {
+        textColor: "--_text",
+        titleColor: "--_title",
+        backgroundColor: "--_bg",
+        borderColor: "--_border",
+        borderHoverColor: "--_border-hover",
+        dismissButtonColor: "--_dismiss",
+        dismissButtonHoverColor: "--_dismiss-hover",
+    };
     constructor(props) {
         let template = props.template.content.cloneNode(true);
         let toast = template.querySelector(".toast");
@@ -136,6 +145,11 @@ export class Toast {
         else {
             dismissButton.remove();
         }
+        if (props.style) {
+            for (let key of Object.keys(props.style)) {
+                toast.style.setProperty(Toast.cssProps[key], props.style[key]);
+            }
+        }
         document.body.prepend(template);
         this.height = toast.getBoundingClientRect().height;
         this.element = toast;
@@ -144,7 +158,7 @@ export class Toast {
         if (this.removed)
             return;
         this.removed = true;
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
             this.element?.classList.add("remove");
             setTimeout(() => {
                 this.element?.remove();
@@ -159,7 +173,7 @@ export class Toast {
         let newToast = new Toast(props);
         let resolver = null;
         if (props.duration > 0) {
-            resolver = new Promise(resolve => {
+            resolver = new Promise((resolve) => {
                 setTimeout(() => {
                     newToast.remove()?.then(() => {
                         resolve(newToast);
