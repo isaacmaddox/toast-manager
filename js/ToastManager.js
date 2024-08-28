@@ -1,12 +1,3 @@
-// #region Types
-var ToastType;
-(function (ToastType) {
-    ToastType[ToastType["Neutral"] = 0] = "Neutral";
-    ToastType[ToastType["Success"] = 1] = "Success";
-    ToastType[ToastType["Warn"] = 2] = "Warn";
-    ToastType[ToastType["Error"] = 3] = "Error";
-})(ToastType || (ToastType = {}));
-// #endregion Types
 // #region Classes
 /**
  * Class to manage Toasts
@@ -18,14 +9,11 @@ export class ToastManager {
     activeToasts = [];
     template;
     constructor() {
-        // Check for the necessary template elements
         const template = document.getElementById("toast");
         if (!template) {
             throw new Error("The necessary <template> element was not found on this page");
         }
-        else {
-            this.template = template;
-        }
+        this.template = template;
     }
     buildProps(props, type) {
         return {
@@ -33,7 +21,8 @@ export class ToastManager {
             duration: props.duration !== undefined ? props.duration : this.DEFAULT_DURATION,
             type: type,
             template: this.template,
-            listener: this
+            listener: this,
+            dismissable: props.dismissable ?? true
         };
     }
     pushToast(newToast, resolver) {
@@ -80,12 +69,18 @@ export class ToastManager {
         let y = this.INITIAL_Y;
         for (let i = 0; i < snapshot.length; ++i) {
             snapshot[i].setTop(y);
-            snapshot[i].setDelay(i * 30);
             y += Math.ceil(snapshot[i].getHeight() + this.GAP);
         }
     }
+    getCount() {
+        return this.activeToasts.length;
+    }
     onToastRemoved(toast) {
-        this.activeToasts.splice(this.activeToasts.indexOf(toast), 1);
+        let index = this.activeToasts.indexOf(toast);
+        this.activeToasts.splice(index, 1);
+        for (let i = index; i < this.activeToasts.length; ++i) {
+            this.activeToasts[i].setDelay((i - index) * 30);
+        }
         this.updatePositions();
     }
 }
@@ -93,7 +88,7 @@ export class ToastManager {
  * The internal class representing a Toast
  */
 export class Toast {
-    TRANSITION_DURATION = 500;
+    TRANSITION_DURATION = 300;
     element;
     height;
     removed = false;
@@ -131,11 +126,16 @@ export class Toast {
             toast.onclick = props.onclick;
             toast.classList.add("has-listener");
         }
-        dismissButton.onclick = () => {
-            this.remove().then(() => {
-                props.listener.onToastRemoved(this);
-            });
-        };
+        if (props.dismissable) {
+            dismissButton.onclick = () => {
+                this.remove().then(() => {
+                    props.listener.onToastRemoved(this);
+                });
+            };
+        }
+        else {
+            dismissButton.remove();
+        }
         document.body.prepend(template);
         this.height = toast.getBoundingClientRect().height;
         this.element = toast;
@@ -176,4 +176,11 @@ export class Toast {
         return this.height;
     }
 }
-// #endregion Classes
+var ToastType;
+(function (ToastType) {
+    ToastType[ToastType["Neutral"] = 0] = "Neutral";
+    ToastType[ToastType["Success"] = 1] = "Success";
+    ToastType[ToastType["Warn"] = 2] = "Warn";
+    ToastType[ToastType["Error"] = 3] = "Error";
+})(ToastType || (ToastType = {}));
+// #endregion Types

@@ -1,35 +1,3 @@
-// #region Types
-
-export type ToastProps = {
-   type: ToastType;
-   template: HTMLTemplateElement;
-   title?: string;
-   message: string;
-   duration: number;
-   onclick?: (this: GlobalEventHandlers, ev: MouseEvent) => any;
-   listener: ToastListener
-}
-
-export type ToastBuildProps = {
-   title?: string;
-   message: string;
-   duration?: number;
-   onclick?: (this: GlobalEventHandlers, ev: MouseEvent) => any;
-}
-
-enum ToastType {
-   Neutral,
-   Success,
-   Warn,
-   Error
-}
-
-interface ToastListener {
-   onToastRemoved(toast: Toast): void;
-}
-
-// #endregion Types
-
 // #region Classes
 
 /**
@@ -43,14 +11,13 @@ export class ToastManager implements ToastListener {
    private template: HTMLTemplateElement;
 
    constructor() {
-      // Check for the necessary template elements
       const template = document.getElementById("toast") as HTMLTemplateElement;
 
       if (!template) {
          throw new Error("The necessary <template> element was not found on this page");
-      } else {
-         this.template = template;
       }
+
+      this.template = template;
    }
 
    private buildProps(props: ToastBuildProps, type: ToastType): ToastProps {
@@ -59,7 +26,8 @@ export class ToastManager implements ToastListener {
          duration: props.duration !== undefined ? props.duration : this.DEFAULT_DURATION,
          type: type,
          template: this.template,
-         listener: this
+         listener: this,
+         dismissable: props.dismissable ?? true
       }
    }
 
@@ -114,13 +82,22 @@ export class ToastManager implements ToastListener {
 
       for (let i = 0; i < snapshot.length; ++i) {
          snapshot[i].setTop(y);
-         snapshot[i].setDelay(i * 30);
          y += Math.ceil(snapshot[i].getHeight() + this.GAP);
       }
    }
 
+   getCount(): number {
+      return this.activeToasts.length;
+   }
+
    onToastRemoved(toast: Toast) {
-      this.activeToasts.splice(this.activeToasts.indexOf(toast), 1);
+      let index = this.activeToasts.indexOf(toast)
+      this.activeToasts.splice(index, 1);
+
+      for (let i = index; i < this.activeToasts.length; ++i) {
+         this.activeToasts[i].setDelay((i - index) * 30);
+      }
+
       this.updatePositions();
    }
 }
@@ -129,7 +106,7 @@ export class ToastManager implements ToastListener {
  * The internal class representing a Toast
  */
 export class Toast {
-   private readonly TRANSITION_DURATION = 500;
+   private readonly TRANSITION_DURATION = 300;
    private element: HTMLDivElement;
    private height: number;
    private removed: boolean = false;
@@ -175,11 +152,15 @@ export class Toast {
          toast.classList.add("has-listener");
       }
 
-      dismissButton.onclick = () => {
-         this.remove().then(() => {
-            props.listener.onToastRemoved(this);
-         });
-      };
+      if (props.dismissable) {
+         dismissButton.onclick = () => {
+            this.remove().then(() => {
+               props.listener.onToastRemoved(this);
+            });
+         };
+      } else {
+         dismissButton.remove();
+      }
 
       document.body.prepend(template);
       this.height = toast.getBoundingClientRect().height;
@@ -232,3 +213,37 @@ export class Toast {
 }
 
 // #endregion Classes
+
+// #region Types
+
+export type ToastProps = {
+   type: ToastType;
+   template: HTMLTemplateElement;
+   title?: string;
+   message: string;
+   duration: number;
+   onclick?: (this: GlobalEventHandlers, ev: MouseEvent) => any;
+   listener: ToastListener;
+   dismissable: boolean;
+}
+
+export type ToastBuildProps = {
+   title?: string;
+   message: string;
+   duration?: number;
+   onclick?: (this: GlobalEventHandlers, ev: MouseEvent) => any;
+   dismissable?: boolean;
+}
+
+enum ToastType {
+   Neutral,
+   Success,
+   Warn,
+   Error
+}
+
+interface ToastListener {
+   onToastRemoved(toast: Toast): void;
+}
+
+// #endregion Types

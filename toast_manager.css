@@ -16,28 +16,24 @@
     --tm-neutral-border-color: light-dark(hsla(0, 0%, 0%, .1), hsla(0, 0%, 100%, .1));
     --tm-neutral-border-hover-color: light-dark(hsla(0, 0%, 0%, .2), hsla(0, 0%, 100%, .2));
     --tm-neutral-text-color: light-dark(hsl(0, 0%, 20%), hsl(0, 0%, 90%));
-    --tm-neutral-timer-color: light-dark(hsl(0, 0%, 40%), hsl(0, 0%, 60%));
     --tm-neutral-title-color: light-dark(hsl(0, 0%, 0%), hsl(0, 0%, 100%));
 
     --tm-warn-background-color: hsl(35, 100%, 90%);
     --tm-warn-border-color: hsla(35, 50%, 35%, .1);
     --tm-warn-border-hover-color: hsla(35, 50%, 15%, .2);
     --tm-warn-text-color: hsl(35, 50%, 20%);
-    --tm-warn-timer-color: hsl(35, 80%, 35%);
     --tm-warn-title-color: hsl(35, 65%, 15%);
 
     --tm-error-background-color: hsl(10, 100%, 90%);
     --tm-error-border-color: hsla(10, 50%, 10%, .1);
     --tm-error-border-hover-color: hsla(10, 50%, 15%, .2);
     --tm-error-text-color: hsl(10, 50%, 20%);
-    --tm-error-timer-color: hsl(10, 80%, 35%);
     --tm-error-title-color: hsl(10, 65%, 15%);
 
     --tm-success-background-color: hsl(150, 100%, 90%);
     --tm-success-border-color: hsla(150, 50%, 10%, .1);
     --tm-success-border-hover-color: hsla(150, 50%, 15%, .2);
     --tm-success-text-color: hsl(150, 50%, 20%);
-    --tm-success-timer-color: hsl(150, 80%, 35%);
     --tm-success-title-color: hsl(150, 65%, 15%);
 }
 
@@ -48,7 +44,6 @@
     --_delay: 0ms;
     --_duration: 2000ms;
     --_text: var(--tm-neutral-text-color);
-    --_timer: var(--tm-neutral-timer-color);
     --_title: var(--tm-neutral-title-color);
     --_z: var(--tm-z);
 
@@ -71,14 +66,13 @@
     padding: var(--tm-padding-block) var(--tm-padding-block) var(--tm-padding-block) var(--tm-padding-inline);
     position: fixed;
     top: var(--_top);
-    transition: opacity 200ms ease, top 300ms cubic-bezier(0.19, 1, 0.22, 1) var(--_delay), transform 300ms cubic-bezier(0.19, 1, 0.22, 1);
+    transition: opacity 200ms ease, top 300ms cubic-bezier(0.19, 1, 0.22, 1) var(--_delay), transform 300ms cubic-bezier(0.19, 1, 0.22, 1), border 200ms ease;
 
     &.warn {
         --_bg: var(--tm-warn-background-color);
         --_border-hover: var(--tm-warn-border-hover-color);
         --_border: var(--tm-warn-border-color);
         --_text: var(--tm-warn-text-color);
-        --_timer: var(--tm-warn-timer-color);
         --_title: var(--tm-warn-title-color);
     }
 
@@ -87,7 +81,6 @@
         --_border-hover: var(--tm-error-border-hover-color);
         --_border: var(--tm-error-border-color);
         --_text: var(--tm-error-text-color);
-        --_timer: var(--tm-error-timer-color);
         --_title: var(--tm-error-title-color);
     }
 
@@ -96,7 +89,6 @@
         --_border-hover: var(--tm-success-border-hover-color);
         --_border: var(--tm-success-border-color);
         --_text: var(--tm-success-text-color);
-        --_timer: var(--tm-success-timer-color);
         --_title: var(--tm-success-title-color);
     }
 
@@ -152,6 +144,7 @@
         display: grid;
         grid-column: button;
         padding: 0px;
+        transition: color 200ms ease;
 
         @media (pointer: fine) {
             &:hover {
