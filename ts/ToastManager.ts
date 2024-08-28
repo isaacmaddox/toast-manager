@@ -185,8 +185,8 @@ export class Toast {
     }
 
     if (props.style) {
-      for (let key of Object.keys(props.style)) {
-        toast.style.setProperty(Toast.cssProps[key], props.style[key]);
+      for (const [key, value] of Object.entries(props.style)) {
+        toast.style.setProperty(Toast.cssProps[key], value);
       }
     }
 
