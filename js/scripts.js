@@ -12,6 +12,7 @@ let input = document.querySelector("input");
 document.getElementById("toast-trigger").addEventListener("click", () => {
     active = toastManager.getCount();
     let msg = input.value.trim() !== "" ? input.value.trim() : messages[Math.floor(Math.random() * messages.length)];
+    input.value = "";
     if (active <= 3) {
         toastManager.notify({
             message: msg,
