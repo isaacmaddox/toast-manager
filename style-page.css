@@ -29,15 +29,53 @@ header {
       font-size: 1.2rem;
    }
 
-   .btn-group {
+   .hero-form {
       display: flex;
+      flex-direction: column;
       gap: .5rem;
+      min-width: min(100%, 30ch);
+
+      input {
+         border: 1px solid hsl(0, 0%, 92%);
+         padding: .75rem 1.2rem;
+         font-size: 1rem;
+         border-radius: .5em;
+         outline-offset: 1px;
+         outline: 2px solid transparent;
+         transition: outline 200ms ease, border 200ms ease;
+         color: hsl(0, 0%, 20);
+
+         &::placeholder {
+            color: hsl(0, 0%, 70%);
+         }
+
+         &:focus-visible {
+            outline-color: hsl(220, 80%, 40%);
+            border-color: hsl(220, 80%, 40%);
+         }
+      }
+   }
+
+   .btn-group {
+      display: grid;
+      gap: .5rem;
+      grid-template-columns: repeat(2, 1fr);
+
+      button,
+      .btn {
+         width: 100%;
+      }
+
+      @media (width < 728px) {
+         grid-template-columns: 1fr;
+         width: 100%;
+      }
    }
 
    button,
    .btn {
       --_bg: hsl(0, 0%, 98%);
-      --_bg-hover: hsl(0, 0%, 96%);
+      --_bg-hover: hsl(0, 0%, 94%);
       --_border: hsl(0, 0%, 80%);
       --_border-hover: hsl(0, 0%, 75%);
       --_color: hsl(0, 0%, 0%);
@@ -83,10 +121,10 @@ header {
       }
 
       &.primary {
-         --_bg: hsl(250, 50%, 40%);
-         --_bg-hover: hsl(250, 50%, 50%);
-         --_border: hsl(250, 50%, 30%);
-         --_border-hover: hsl(250, 50%, 40%);
+         --_bg: hsl(220, 80%, 40%);
+         --_bg-hover: hsl(220, 80%, 50%);
+         --_border: hsl(220, 80%, 30%);
+         --_border-hover: hsl(220, 80%, 40%);
          --_color: hsl(0, 0%, 100%);
          --_shadow-color: hsla(0, 0%, 0%, .2);
       }

@@ -183,6 +183,10 @@ export class Toast {
    }
 
    static build(props: ToastProps): { newToast: Toast, resolver?: Promise<Toast> } {
+      if (!props.dismissable && props.duration === 0) {
+         throw new Error("A Toast must either be dismissable or have a non-infinite duration");
+      }
+      
       let newToast = new Toast(props);
       let resolver = null;
 

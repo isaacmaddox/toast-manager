@@ -11,17 +11,15 @@ let messages = [
 ];
 
 let active = toastManager.getCount();
+let input = document.querySelector("input");
 
 document.getElementById("toast-trigger").addEventListener("click", () => {
     active = toastManager.getCount();
-    if (active === 0) {
-        toastManager.success({
-            message: "Welcome to ToastManager",
-        });
-    } else if (active <= 3) {
+    let msg = input.value.trim() !== "" ? input.value.trim() : messages[Math.floor(Math.random() * messages.length)];
+
+    if (active <= 3) {
         toastManager.notify({
-            message: messages[Math.floor(Math.random() * messages.length)],
-            dismissable: false,
+            message: msg,
         })
     } else if (active < 5) {
         toastManager.warn({

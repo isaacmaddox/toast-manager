@@ -153,6 +153,9 @@ export class Toast {
         });
     }
     static build(props) {
+        if (!props.dismissable && props.duration === 0) {
+            throw new Error("A Toast must either be dismissable or have a non-infinite duration");
+        }
         let newToast = new Toast(props);
         let resolver = null;
         if (props.duration > 0) {
