@@ -2,7 +2,12 @@
 *::before,
 *::after {
    box-sizing: border-box;
-   font-family: "Geist Variable", system-ui;
+   font-family: "Geist", system-ui;
+}
+
+@font-face {
+   font-family: "Geist";
+   src: url(./GeistVF.ttf);
 }
 
 body,
@@ -33,11 +38,7 @@ header {
       display: flex;
       flex-direction: column;
       gap: .5rem;
-      min-width: min(100%, 30ch);
-
-      @media (width < 400px) {
-         width: 100%;
-      }
+      min-width: 100%;
 
       input {
          border: 1px solid hsl(0, 0%, 92%);
