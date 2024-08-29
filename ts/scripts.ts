@@ -6,7 +6,7 @@ document.getElementById("toast-trigger").addEventListener("click", () => {
   let msg = (document.getElementById("toast-content") as HTMLInputElement).value.trim();
   if (msg === "") msg = "Hello, World!";
 
-  let hue = Math.floor(Math.random() * 255);
+  let hue = Math.floor(Math.random() * 256);
 
   manager.notify({
     message: msg,
