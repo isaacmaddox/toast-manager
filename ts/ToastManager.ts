@@ -1,126 +1,89 @@
-// #region Classes
-
-/**
- * Class to manage Toasts
- */
-export class ToastManager implements ToastListener {
+export default class ToastManager {
   private readonly DEFAULT_DURATION = 3000;
-  private readonly INITIAL_Y = 16;
+  private readonly INITIAL_TOP = 16;
   private readonly GAP = 8;
   private activeToasts: Toast[] = [];
   private template: HTMLTemplateElement;
 
   constructor() {
-    const template = document.getElementById("toast") as HTMLTemplateElement;
+    let template = document.getElementById("tm-template") as HTMLTemplateElement;
 
     if (!template) {
-      throw new Error(
-        "The necessary <template> element was not found on this page"
-      );
+      throw new Error("ToastManager couldn't find the necessary <template> element on this page");
     }
 
     this.template = template;
   }
 
-  private buildProps(props: ToastBuildProps, type: ToastType): ToastProps {
+  private getProps(oldProps: ToastProps, type: ToastType): StrictToastProps {
     return {
-      ...props,
-      duration:
-        props.duration !== undefined ? props.duration : this.DEFAULT_DURATION,
+      ...oldProps,
       type: type,
+      duration: oldProps.duration ?? this.DEFAULT_DURATION,
+      dismissable: oldProps.dismissable ?? true,
       template: this.template,
-      listener: this,
-      dismissable: props.dismissable ?? true,
+      onRemove: (t) => {
+        this.onToastRemove(t);
+      },
     };
   }
 
-  private pushToast(newToast: Toast, resolver: Promise<Toast>) {
+  private updateToastProps() {
+    let top = this.INITIAL_TOP;
+
+    for (const toast of this.activeToasts) {
+      toast.top = top;
+      top += toast.height + this.GAP;
+    }
+  }
+
+  private updateToastDelay(start: number) {
+    for (let i = start; i < this.activeToasts.length; ++i) {
+      this.activeToasts[i].delay = (i - start) * 30;
+    }
+  }
+
+  private onToastRemove(toast: Toast) {
+    let ind = this.activeToasts.indexOf(toast);
+    this.activeToasts.splice(ind, 1);
+    this.updateToastProps();
+    this.updateToastDelay(ind);
+  }
+
+  makeToast(props: ToastProps, type: ToastType) {
+    let strictProps = this.getProps(props, type);
+    let newToast = new Toast(strictProps);
     this.activeToasts.push(newToast);
-    this.updatePositions();
-
-    resolver?.then((toast) => {
-      this.onToastRemoved(toast);
-    });
+    this.updateToastProps();
   }
 
-  /**
-   * Build and push a neutral toast to the user.
-   * @param props Properties for the toast.
-   */
-  notify(props: ToastBuildProps) {
-    const { newToast, resolver } = Toast.build(
-      this.buildProps(props, ToastType.Neutral)
-    );
-    this.pushToast(newToast, resolver);
+  notify(props: ToastProps) {
+    this.makeToast(props, ToastType.Neutral);
   }
 
-  /**
-   * Build and push a success toast to the user.
-   * @param props Properties for the toast.
-   */
-  success(props: ToastBuildProps) {
-    const { newToast, resolver } = Toast.build(
-      this.buildProps(props, ToastType.Success)
-    );
-    this.pushToast(newToast, resolver);
+  success(props: ToastProps) {
+    this.makeToast(props, ToastType.Success);
   }
 
-  /**
-   * Build and push a warning toast to the user.
-   * @param props Properties for the toast.
-   */
-  warn(props: ToastBuildProps) {
-    const { newToast, resolver } = Toast.build(
-      this.buildProps(props, ToastType.Warn)
-    );
-    this.pushToast(newToast, resolver);
+  warn(props: ToastProps) {
+    this.makeToast(props, ToastType.Warn);
   }
 
-  /**
-   * Build and push an error toast to the user.
-   * @param props Properties for the toast.
-   */
-  error(props: ToastBuildProps) {
-    const { newToast, resolver } = Toast.build(
-      this.buildProps(props, ToastType.Error)
-    );
-    this.pushToast(newToast, resolver);
+  error(props: ToastProps) {
+    this.makeToast(props, ToastType.Error);
   }
 
-  private updatePositions() {
-    let snapshot = [...this.activeToasts];
-    let y = this.INITIAL_Y;
-
-    for (let i = 0; i < snapshot.length; ++i) {
-      snapshot[i].setTop(y);
-      y += Math.ceil(snapshot[i].getHeight() + this.GAP);
-    }
-  }
-
-  getCount(): number {
+  get toastCount(): number {
     return this.activeToasts.length;
-  }
-
-  onToastRemoved(toast: Toast) {
-    let index = this.activeToasts.indexOf(toast);
-    this.activeToasts.splice(index, 1);
-
-    for (let i = index; i < this.activeToasts.length; ++i) {
-      this.activeToasts[i].setDelay((i - index) * 30);
-    }
-
-    this.updatePositions();
   }
 }
 
-/**
- * The internal class representing a Toast
- */
 export class Toast {
-  private readonly TRANSITION_DURATION = 300;
+  public height: number;
+  private readonly ANIMATION_DURATION = 300;
   private element: HTMLDivElement;
-  private height: number;
-  private removed: boolean = false;
+  private props: StrictToastProps;
+  private timeout: number;
   private static cssProps = {
     textColor: "--_text",
     titleColor: "--_title",
@@ -131,16 +94,38 @@ export class Toast {
     dismissButtonHoverColor: "--_dismiss-hover",
   };
 
-  constructor(props: ToastProps) {
-    let template = props.template.content.cloneNode(
-      true
-    ) as HTMLTemplateElement;
-    let toast = template.querySelector(".toast") as HTMLDivElement;
+  constructor(props: StrictToastProps) {
+    this.props = props;
+    const toast = (props.template.content.cloneNode(true) as HTMLElement).querySelector(".toast") as HTMLDivElement;
+    const titleElement = toast.querySelector(".toast-title");
+    const messageElement = toast.querySelector(".toast-message");
+    const dismissButton = toast.querySelector("button.dismiss") as HTMLButtonElement;
+
+    // Error checking
+    if (props.duration < 0) props.duration = 0;
+
+    if (!props.dismissable && props.duration === 0) {
+      throw new Error("Toasts must be dismissable or have a non-infinite duration");
+    }
+
+    // Remove unecessary elements, else set their values
+    if (!props.title) {
+      titleElement.remove();
+    } else {
+      titleElement.textContent = props.title;
+    }
+
+    if (!props.dismissable) {
+      dismissButton.remove();
+    } else {
+      dismissButton.onclick = () => {
+        this.remove();
+      };
+    }
+
+    messageElement.textContent = props.message;
 
     switch (props.type) {
-      case ToastType.Neutral:
-        toast.classList.add("neutral");
-        break;
       case ToastType.Success:
         toast.classList.add("success");
         break;
@@ -150,140 +135,70 @@ export class Toast {
       case ToastType.Error:
         toast.classList.add("error");
         break;
+      default:
+        toast.classList.add("neutral");
+        break;
     }
+
+    if (props.style)
+      for (const [key, value] of Object.entries(props.style)) {
+        toast.style.setProperty(Toast.cssProps[key], value);
+      }
 
     if (props.type === ToastType.Warn || props.type === ToastType.Error) {
       toast.ariaLive = "assertive";
     }
 
-    let messageText = template.querySelector(".toast-message");
-    messageText.textContent = props.message;
-
-    let titleText = template.querySelector(".toast-title");
-
-    let dismissButton = template.querySelector(".dismiss") as HTMLButtonElement;
-
-    if (!props.title) {
-      titleText.remove();
-    } else {
-      titleText.textContent = props.title;
-    }
-
-    if (props.onclick) {
-      toast.onclick = props.onclick;
-      toast.classList.add("has-listener");
-    }
-
-    if (props.dismissable) {
-      dismissButton.onclick = () => {
-        this.remove().then(() => {
-          props.listener.onToastRemoved(this);
-        });
-      };
-    } else {
-      dismissButton.remove();
-    }
-
-    if (props.style) {
-      for (const [key, value] of Object.entries(props.style)) {
-        toast.style.setProperty(Toast.cssProps[key], value);
-      }
-    }
-
-    document.body.prepend(template);
+    document.body.prepend(toast);
     this.height = toast.getBoundingClientRect().height;
-    this.element = toast as HTMLDivElement;
-  }
+    this.element = toast;
 
-  remove(): Promise<boolean> {
-    if (this.removed) return;
-    this.removed = true;
-
-    return new Promise<boolean>((resolve) => {
-      this.element?.classList.add("remove");
-
-      setTimeout(() => {
-        this.element?.remove();
-      }, this.TRANSITION_DURATION);
-
-      resolve(true);
-    });
-  }
-
-  static build(props: ToastProps): {
-    newToast: Toast;
-    resolver?: Promise<Toast>;
-  } {
-    if (!props.dismissable && props.duration === 0) {
-      throw new Error(
-        "A Toast must either be dismissable or have a non-infinite duration"
-      );
+    if (props.duration !== 0) {
+      this.timeout = setTimeout(() => {
+        this.remove();
+      }, props.duration + this.ANIMATION_DURATION);
     }
-
-    let newToast = new Toast(props);
-    let resolver = null;
-
-    if (props.duration > 0) {
-      resolver = new Promise<Toast>((resolve) => {
-        setTimeout(() => {
-          newToast.remove()?.then(() => {
-            resolve(newToast);
-          });
-        }, props.duration);
-      });
-    }
-
-    return { newToast, resolver };
   }
 
-  setDelay(newDelay: number) {
-    this.element.style.setProperty("--_delay", `${newDelay}ms`);
+  private remove() {
+    this.element.classList.add("remove");
+    clearTimeout(this.timeout);
+    this.props.onRemove(this);
+
+    setTimeout(() => {
+      this.element.remove();
+    }, this.ANIMATION_DURATION);
   }
 
-  setTop(newTop: number) {
+  set top(newTop: number) {
     this.element.style.setProperty("--_top", `${newTop}px`);
   }
 
-  getHeight(): number {
-    return this.height;
+  set delay(newDelay: number) {
+    this.element.style.setProperty("--_delay", `${newDelay}ms`);
   }
 }
 
-// #endregion Classes
-
-// #region Types
-
 export type ToastProps = {
-  type: ToastType;
-  template: HTMLTemplateElement;
-  title?: string;
-  message: string;
-  duration: number;
-  onclick?: (this: GlobalEventHandlers, ev: MouseEvent) => any;
-  listener: ToastListener;
-  dismissable: boolean;
-  style?: ToastStyles;
-};
-
-export type ToastBuildProps = {
   title?: string;
   message: string;
   duration?: number;
-  onclick?: (this: GlobalEventHandlers, ev: MouseEvent) => any;
   dismissable?: boolean;
   style?: ToastStyles;
+  onClick?: (this: GlobalEventHandlers, ev: MouseEvent) => any;
 };
 
-enum ToastType {
-  Neutral,
-  Success,
-  Warn,
-  Error,
-}
-
-interface ToastListener {
-  onToastRemoved(toast: Toast): void;
-}
+type StrictToastProps = {
+  type: ToastType;
+  title?: string;
+  message: string;
+  duration: number;
+  dismissable: boolean;
+  style?: ToastStyles;
+  template: HTMLTemplateElement;
+  onClick?: (this: GlobalEventHandlers, ev: MouseEvent) => any;
+  onRemove: (toast: Toast) => void;
+};
 
 export type ToastStyles = {
   textColor?: string;
@@ -295,4 +210,9 @@ export type ToastStyles = {
   dismissButtonHoverColor?: string;
 };
 
-// #endregion Types
+enum ToastType {
+  Neutral,
+  Success,
+  Warn,
+  Error,
+}

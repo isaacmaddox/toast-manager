@@ -1,41 +1,23 @@
-import { ToastManager } from "./ToastManager.js";
+import ToastManager from "./ToastManager.js";
 
-let toastManager = new ToastManager();
-
-let messages = [
-  "Here's to you!",
-  "Glad you could make it!",
-  "Thanks for showing up!",
-  "Boo!",
-  "¡Bienvenidos!",
-];
-
-let active = toastManager.getCount();
-let input = document.querySelector("input");
+let manager = new ToastManager();
 
 document.getElementById("toast-trigger").addEventListener("click", () => {
-  active = toastManager.getCount();
-  let msg =
-    input.value.trim() !== ""
-      ? input.value.trim()
-      : messages[Math.floor(Math.random() * messages.length)];
-  input.value = "";
+  let msg = (document.getElementById("toast-content") as HTMLInputElement).value.trim();
+  if (msg === "") msg = "Hello, World!";
 
-  if (active <= 3) {
-    toastManager.notify({
-      message: msg,
-    });
-  } else if (active < 5) {
-    toastManager.warn({
-      title: "Woah there!",
-      message:
-        "Looks like you're getting carried away. Wouldn't want to have to stop you...",
-      duration: 6000,
-    });
-  } else if (active < 6) {
-    toastManager.error({
-      message: "We'll have to stop you there",
-      duration: 0,
-    });
-  }
+  let hue = Math.floor(Math.random() * 255);
+
+  manager.notify({
+    message: msg,
+    duration: 3000,
+    style: {
+      backgroundColor: `hsl(${hue}, 50%, 95%)`,
+      borderColor: `hsl(${hue}, 50%, 80%)`,
+      borderHoverColor: `hsl(${hue}, 50%, 75%)`,
+      dismissButtonColor: `hsl(${hue}, 60%, 65%)`,
+      dismissButtonHoverColor: `hsl(${hue}, 60%, 35%)`,
+      textColor: `hsl(${hue}, 60%, 25%)`,
+    },
+  });
 });
