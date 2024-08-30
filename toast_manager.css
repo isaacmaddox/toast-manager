@@ -13,32 +13,32 @@
     --tm-neutral-background-color: light-dark(hsl(0, 0%, 100%), hsl(0, 0%, 15%));
     --tm-neutral-border-color: light-dark(hsla(0, 0%, 0%, .1), hsla(0, 0%, 100%, .1));
     --tm-neutral-border-hover-color: light-dark(hsla(0, 0%, 0%, .2), hsla(0, 0%, 100%, .2));
-    --tm-neutral-text-color: light-dark(hsl(0, 0%, 20%), hsl(0, 0%, 90%));
-    --tm-neutral-title-color: light-dark(hsl(0, 0%, 0%), hsl(0, 0%, 100%));
+    --tm-neutral-text-color: light-dark(hsl(0, 0%, 30%), hsl(0, 0%, 70%));
+    --tm-neutral-title-color: light-dark(hsl(0, 0%, 10%), hsl(0, 0%, 90%));
     --tm-neutral-dismiss-icon-color: hsl(0, 0%, 65%);
     --tm-neutral-dismiss-icon-hover-color: hsl(0, 0%, 35%);
 
     --tm-warn-background-color: hsl(35, 100%, 90%);
     --tm-warn-border-color: hsla(35, 50%, 35%, .1);
     --tm-warn-border-hover-color: hsla(35, 50%, 15%, .2);
-    --tm-warn-text-color: hsl(35, 50%, 20%);
-    --tm-warn-title-color: hsl(35, 65%, 15%);
+    --tm-warn-text-color: hsl(35, 50%, 30%);
+    --tm-warn-title-color: hsl(35, 65%, 20%);
     --tm-warn-dismiss-icon-color: hsl(35, 50%, 65%);
     --tm-warn-dismiss-icon-hover-color: hsl(35, 50%, 35%);
 
     --tm-error-background-color: hsl(10, 100%, 90%);
     --tm-error-border-color: hsla(10, 50%, 10%, .1);
     --tm-error-border-hover-color: hsla(10, 50%, 15%, .2);
-    --tm-error-text-color: hsl(10, 50%, 20%);
-    --tm-error-title-color: hsl(10, 65%, 15%);
+    --tm-error-text-color: hsl(10, 50%, 30%);
+    --tm-error-title-color: hsl(10, 65%, 20%);
     --tm-error-dismiss-icon-color: hsl(10, 50%, 65%);
     --tm-error-dismiss-icon-hover-color: hsl(10, 50%, 35%);
 
     --tm-success-background-color: hsl(150, 100%, 90%);
     --tm-success-border-color: hsla(150, 50%, 10%, .1);
     --tm-success-border-hover-color: hsla(150, 50%, 15%, .2);
-    --tm-success-text-color: hsl(150, 50%, 20%);
-    --tm-success-title-color: hsl(150, 65%, 15%);
+    --tm-success-text-color: hsl(150, 50%, 30%);
+    --tm-success-title-color: hsl(150, 65%, 20%);
     --tm-success-dismiss-icon-color: hsl(150, 50%, 65%);
     --tm-success-dismiss-icon-hover-color: hsl(150, 50%, 35%);
 }
