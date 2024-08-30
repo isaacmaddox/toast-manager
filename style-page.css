@@ -17,6 +17,18 @@ html {
    width: 100%;
 }
 
+.visuallyhidden {
+   position: absolute;
+   clip: rect(1px, 1px, 1px, 1px);
+   -webkit-clip-path: inset(0px 0px 99.9% 99.9%);
+   clip-path: inset(0px 0px 99.9% 99.9%);
+   overflow: hidden;
+   height: 1px;
+   width: 1px;
+   padding: 0;
+   border: 0;
+}
+
 header {
    display: grid;
    justify-items: center;
@@ -86,68 +98,10 @@ header {
          width: 100%;
       }
    }
-
-   button,
-   .btn {
-      --_bg: hsl(0, 0%, 98%);
-      --_bg-hover: hsl(0, 0%, 94%);
-      --_border: hsl(0, 0%, 80%);
-      --_border-hover: hsl(0, 0%, 75%);
-      --_color: hsl(0, 0%, 0%);
-      --_shadow-color: hsla(0, 0%, 0%, .1);
-
-      align-items: center;
-      background: var(--_bg);
-      border-radius: .5em;
-      border: 1px solid var(--_border);
-      color: var(--_color);
-      cursor: pointer;
-      display: flex;
-      font-size: 1rem;
-      font-weight: 600;
-      justify-content: center;
-      padding: .75rem 1.2rem;
-      text-decoration: none;
-      transition: background 200ms ease, border 200ms ease, transform 300ms cubic-bezier(0.19, 1, 0.22, 1), box-shadow 200ms ease;
-      width: -moz-fit-content;
-      width: fit-content;
-      gap: .5rem;
-
-      & svg {
-         width: 1lh;
-         height: 1lh;
-
-         :not([stroke]) {
-            fill: currentColor;
-         }
-
-         [stroke] {
-            stroke: currentColor;
-         }
-      }
-
-      @media (pointer: fine) {
-         &:hover {
-            background: var(--_bg-hover);
-            border-color: var(--_border-hover);
-            box-shadow: 0px 3px 10px var(--_shadow-color);
-            transform: translateY(-2px);
-         }
-      }
-
-      &.primary {
-         --_bg: hsl(220, 80%, 40%);
-         --_bg-hover: hsl(220, 80%, 50%);
-         --_border: hsl(220, 80%, 30%);
-         --_border-hover: hsl(220, 80%, 40%);
-         --_color: hsl(0, 0%, 100%);
-         --_shadow-color: hsla(0, 0%, 0%, .2);
-      }
-   }
 }
 
 section {
-   padding: 4rem;
+   padding: 4rem 1rem;
 
    h2 {
       font-size: 2rem;
@@ -178,5 +132,199 @@ section {
             margin: 0;
          }
       }
+   }
+}
+
+.btn {
+   --_bg: hsl(0, 0%, 98%);
+   --_bg-hover: hsl(0, 0%, 94%);
+   --_border: hsl(0, 0%, 80%);
+   --_border-hover: hsl(0, 0%, 75%);
+   --_color: hsl(0, 0%, 0%);
+   --_shadow-color: hsla(0, 0%, 0%, .1);
+
+   align-items: center;
+   background: var(--_bg);
+   border-radius: .5em;
+   border: 1px solid var(--_border);
+   color: var(--_color);
+   cursor: pointer;
+   display: flex;
+   font-size: 1rem;
+   font-weight: 600;
+   justify-content: center;
+   padding: .75rem 1.2rem;
+   text-decoration: none;
+   transition: background 200ms ease, border 200ms ease, transform 300ms cubic-bezier(0.19, 1, 0.22, 1), box-shadow 200ms ease;
+   width: -moz-fit-content;
+   width: fit-content;
+   gap: .5rem;
+
+   & svg {
+      width: 1lh;
+      height: 1lh;
+
+      :not([stroke]) {
+         fill: currentColor;
+      }
+
+      [stroke] {
+         stroke: currentColor;
+      }
+   }
+
+   @media (pointer: fine) {
+      &:hover {
+         background: var(--_bg-hover);
+         border-color: var(--_border-hover);
+         box-shadow: 0px 3px 10px var(--_shadow-color);
+         transform: translateY(-2px);
+      }
+   }
+
+   &.primary {
+      --_bg: hsl(220, 80%, 40%);
+      --_bg-hover: hsl(220, 80%, 50%);
+      --_border: hsl(220, 80%, 30%);
+      --_border-hover: hsl(220, 80%, 40%);
+      --_color: hsl(0, 0%, 100%);
+      --_shadow-color: hsla(0, 0%, 0%, .2);
+   }
+
+   &.toggle {
+      --_bg: transparent;
+      --_bg-hover: transparent;
+      --_border: transparent;
+      --_border-hover: transparent;
+      --_color: hsl(0, 0%, 60%);
+      --_shadow-color: transparent;
+
+      font-weight: 400;
+      font-size: .875rem;
+
+      &:hover {
+         transform: none;
+         color: hsl(0, 0%, 40%);
+      }
+   }
+}
+
+#try-form {
+   display: flex;
+   flex-direction: column;
+   gap: .5rem;
+   max-width: min(100%, 40ch);
+   margin-inline: auto;
+
+   @media (width < 728px) {
+      width: 100%;
+      max-width: unset;
+   }
+
+   label:has([type="text"], [type="number"], select) {
+      border: 1px solid hsla(0, 0%, 0%, .1);
+      display: flex;
+      flex-direction: column;
+      border-radius: .5em;
+      color: hsl(0, 0%, 60%);
+      font-size: .8rem;
+      outline: 1px solid transparent;
+      transition: outline 200ms ease, border 200ms ease;
+      padding: .5em .75em;
+      cursor: text;
+
+      &:focus-within {
+         outline: 1px solid hsl(220, 80%, 40%);
+         border-color: hsl(220, 80%, 40%);
+      }
+
+      input,
+      select {
+         border: none;
+         outline: none;
+         font-size: 1rem;
+         margin-top: .125em;
+         font-weight: 500;
+         color: hsl(0, 0%, 20%);
+      }
+   }
+
+   .advanced {
+      display: none;
+      flex-direction: column;
+      gap: .5em;
+
+      &.show {
+         display: flex;
+      }
+   }
+
+   label:has([type="checkbox"]) {
+      display: flex;
+      gap: .5em;
+      cursor: pointer;
+      align-items: center;
+      margin-block: .5rem;
+      color: hsl(0, 0%, 20%);
+
+      &::before {
+         content: "";
+         height: 20px;
+         width: 20px;
+         border: 2px solid hsl(0, 0%, 0%, .1);
+         border-radius: .25em;
+         transition: background 200ms ease;
+         display: grid;
+         place-items: center;
+         grid-template-rows: 18px;
+         padding: 0;
+      }
+
+      &:has(:checked)::before {
+         background: hsl(220, 80%, 40%);
+         content: url(/check.svg);
+      }
+   }
+
+   .btn {
+      width: 100%;
+   }
+}
+
+.toast-code {
+   background: hsl(0, 0%, 15%);
+   color: hsl(0, 0%, 90%);
+   border: 1px solid hsl(0, 0%, 10%);
+
+   &,
+   & * {
+      font-family: "Geist Mono", monospace;
+   }
+
+   padding: 1.5rem;
+   border-radius: 1em;
+
+   & .hljs-keyword {
+      color: hsl(250, 50%, 80%);
+   }
+
+   & .hljs-title {
+      color: hsl(50, 60%, 70%);
+   }
+
+   & .hljs-title.class_ {
+      color: hsl(160, 75%, 45%);
+   }
+
+   & .hljs-string {
+      color: hsl(20, 70%, 60%);
+   }
+
+   & .hljs-attr {
+      color: hsl(200, 50%, 80%);
+   }
+
+   & .hljs-number {
+      color: hsl(150, 50%, 80%);
    }
 }

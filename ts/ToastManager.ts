@@ -106,6 +106,8 @@ export class Toast {
 
     if (!props.dismissable && props.duration === 0) {
       throw new Error("Toasts must be dismissable or have a non-infinite duration");
+    } else if (props.message.trim() === "") {
+      throw new Error("Toasts must have a message property");
     }
 
     // Remove unecessary elements, else set their values
